@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0"><i class="fas fa-cogs"></i> Emby Manager Settings</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-4">
+                        <label for="emby_url" class="form-label fw-bold">Emby Server URL</label>
+                        <input type="url" class="form-control" id="emby_url" name="emby_url"
+                               value="{{ setting.emby_url or '' }}"
+                               placeholder="http://192.168.1.100:8096" required>
+                        <div class="form-text">Include http/https and port. Do not add trailing slash.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="emby_api_key" class="form-label fw-bold">Emby API Key</label>
+                        <input type="password" class="form-control" id="emby_api_key" name="emby_api_key"
+                               value="{{ setting.emby_api_key or '' }}"
+                               placeholder="e.g. 1a2b3c4d5e6f7g8h9i0j" required>
+                        <div class="form-text">Generate this from your Emby Server Dashboard -> Advanced -> API Keys.</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Save Settings</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
