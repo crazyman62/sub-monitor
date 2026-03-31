@@ -3,7 +3,7 @@
 {% block content %}
 <div class="row">
     <div class="col-md-12 mb-3">
-        <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back to Users</a>
+        <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary" aria-label="Go back to users list"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Users</a>
     </div>
 </div>
 
@@ -17,27 +17,27 @@
                 <form method="POST">
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">First Name</label>
-                            <input type="text" class="form-control" name="first_name" value="{{ user.first_name or '' }}">
+                            <label class="form-label" for="first_name">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name or '' }}">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Last Name</label>
-                            <input type="text" class="form-control" name="last_name" value="{{ user.last_name or '' }}">
+                            <label class="form-label" for="last_name">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name or '' }}">
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email" value="{{ user.email or '' }}">
+                            <label class="form-label" for="email">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email or '' }}">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Facebook Account</label>
-                            <input type="text" class="form-control" name="fb_account" value="{{ user.fb_account or '' }}">
+                            <label class="form-label" for="fb_account">Facebook Account</label>
+                            <input type="text" class="form-control" id="fb_account" name="fb_account" value="{{ user.fb_account or '' }}">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">PayPal Account</label>
-                            <input type="text" class="form-control" name="paypal_account" value="{{ user.paypal_account or '' }}">
+                            <label class="form-label" for="paypal_account">PayPal Account</label>
+                            <input type="text" class="form-control" id="paypal_account" name="paypal_account" value="{{ user.paypal_account or '' }}">
                         </div>
                     </div>
 
@@ -46,8 +46,8 @@
 
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label class="form-label">Package</label>
-                            <select class="form-select" name="package">
+                            <label class="form-label" for="package">Package</label>
+                            <select class="form-select" id="package" name="package">
                                 <option value="">Select Package...</option>
                                 <option value="VOD" {% if user.package == 'VOD' %}selected{% endif %}>VOD</option>
                                 <option value="IPTV" {% if user.package == 'IPTV' %}selected{% endif %}>IPTV</option>
@@ -55,19 +55,19 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Expiry Date</label>
-                            <input type="datetime-local" class="form-control" name="expiry_date"
+                            <label class="form-label" for="expiry_date">Expiry Date</label>
+                            <input type="datetime-local" class="form-control" id="expiry_date" name="expiry_date"
                                 value="{% if user.expiry_date %}{{ user.expiry_date.strftime('%Y-%m-%dT%H:%M') }}{% endif %}">
                             <div class="form-check mt-2">
                                 <input class="form-check-input" type="checkbox" id="do_not_expire" name="do_not_expire" {% if user.do_not_expire %}checked{% endif %}>
                                 <label class="form-check-label text-success" for="do_not_expire">
-                                    <i class="fas fa-infinity"></i> Do Not Expire
+                                    <i class="fas fa-infinity" aria-hidden="true"></i> Do Not Expire
                                 </label>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Paid By (Payer)</label>
-                            <select class="form-select" name="payer_id">
+                            <label class="form-label" for="payer_id">Paid By (Payer)</label>
+                            <select class="form-select" id="payer_id" name="payer_id">
                                 <option value="none">Self / None</option>
                                 {% for u in all_users %}
                                     <option value="{{ u.id }}" {% if user.payer_id == u.id %}selected{% endif %}>{{ u.username }}</option>
