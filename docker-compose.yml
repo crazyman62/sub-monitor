@@ -12,4 +12,4 @@ services:
     environment:
       - SECRET_KEY=generate_a_secure_random_key_here
       - DATABASE_PATH=sqlite:////data/emby_manager.db
-      - TZ=UTC # Change to your TrueNAS timezone, e.g., America/New_York
+      - TZ='America/Detroit' timezone # Change to your TrueNAS timezone, e.g., America/New_York
