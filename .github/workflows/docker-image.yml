@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - feature/emby-manager-13838444456425977904
 
 jobs:
   build-and-push:
