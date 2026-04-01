@@ -42,7 +42,7 @@
                             {% else %}
                                 <span class="badge bg-success">VOD Active</span><br>
                             {% endif %}
-                            {% if user.iptv_is_disabled %}
+                            {% if user.iptv_is_disabled or user.is_disabled %}
                                 <span class="badge bg-danger mt-1">Live TV Disabled</span>
                             {% else %}
                                 <span class="badge bg-success mt-1">Live TV Active</span>

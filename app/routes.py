@@ -29,6 +29,52 @@ def user_details(user_id):
         user.fb_account = request.form.get('fb_account')
         user.paypal_account = request.form.get('paypal_account')
 
+        # Emby Client instantiation for toggles
+        settings = Settings.query.first()
+        emby = None
+        if settings and settings.emby_url and settings.emby_api_key:
+            from app.services.emby import EmbyClient
+            emby = EmbyClient(settings.emby_url, settings.emby_api_key)
+
+        # Handle Toggles
+        if 'toggle_vod' in request.form:
+            if emby:
+                if user.is_disabled:
+                    if emby.enable_user(user.emby_user_id):
+                        user.is_disabled = False
+                        flash("VOD Account manually enabled.", "success")
+                    else:
+                        flash("Failed to enable VOD Account in Emby.", "danger")
+                else:
+                    if emby.disable_user(user.emby_user_id):
+                        user.is_disabled = True
+                        flash("VOD Account manually disabled.", "success")
+                    else:
+                        flash("Failed to disable VOD Account in Emby.", "danger")
+                db.session.commit()
+            else:
+                flash("Emby not configured, cannot toggle.", "danger")
+            return redirect(url_for('main.user_details', user_id=user.id))
+
+        if 'toggle_iptv' in request.form:
+            if emby:
+                if user.iptv_is_disabled:
+                    if emby.enable_iptv(user.emby_user_id):
+                        user.iptv_is_disabled = False
+                        flash("Live TV access manually enabled.", "success")
+                    else:
+                        flash("Failed to enable Live TV access in Emby.", "danger")
+                else:
+                    if emby.disable_iptv(user.emby_user_id):
+                        user.iptv_is_disabled = True
+                        flash("Live TV access manually disabled.", "success")
+                    else:
+                        flash("Failed to disable Live TV access in Emby.", "danger")
+                db.session.commit()
+            else:
+                flash("Emby not configured, cannot toggle.", "danger")
+            return redirect(url_for('main.user_details', user_id=user.id))
+
         # Trial Logic Check First
         trial_type = request.form.get('start_trial')
         override_trial = request.form.get('override_trial') == 'true'
