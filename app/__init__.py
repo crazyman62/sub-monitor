@@ -26,6 +26,13 @@ def create_app():
         from . import models
         db.create_all()
 
+        # Run database migrations for old schemas
+        try:
+            from migrate_db import migrate
+            migrate(app, db)
+        except Exception as e:
+            print(f"Migration failed: {e}")
+
         # Start Scheduler if not already running
         if not scheduler.running:
             from app.tasks import sync_and_check_expiry
