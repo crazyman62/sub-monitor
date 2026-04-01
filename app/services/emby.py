@@ -171,21 +171,25 @@ class EmbyClient:
 
     def get_past_activity(self, user_id):
         """Fetch past activity (like items played)."""
-        # ActivityLog gives general activity, which might be helpful
-        # Unfortunately Emby API doesn't easily expose a simple playback history list per user without
-        # scanning Items or ActivityLog.
-        # We will check System/ActivityLog for playback events.
         try:
-            log = self._get(f'/emby/System/ActivityLog?Limit=20&UserId={user_id}')
+            # Querying the user's played items directly
+            endpoint = f'/emby/Users/{user_id}/Items?IsPlayed=true&SortBy=DatePlayed&SortOrder=Descending&Recursive=true&IncludeItemTypes=Movie,Episode&Limit=20&Fields=Name,DatePlayed,Overview'
+            items_response = self._get(endpoint)
             history = []
-            if log and 'Items' in log:
-                for entry in log['Items']:
-                    if entry.get('Type') == 'VideoPlayback':
-                        history.append({
-                            'name': entry.get('Name'),
-                            'date': entry.get('Date'),
-                            'overview': entry.get('Overview')
-                        })
+            if items_response and 'Items' in items_response:
+                for item in items_response['Items']:
+                    user_data = item.get('UserData', {})
+                    played_date = user_data.get('LastPlayedDate')
+
+                    name = item.get('Name')
+                    if item.get('Type') == 'Episode' and item.get('SeriesName'):
+                        name = f"{item.get('SeriesName')} - {name}"
+
+                    history.append({
+                        'name': name,
+                        'date': played_date if played_date else 'Unknown',
+                        'overview': item.get('Overview', '')
+                    })
             return history
         except Exception:
             return []
