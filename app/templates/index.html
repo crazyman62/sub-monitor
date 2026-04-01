@@ -21,8 +21,8 @@
                         <th>Username</th>
                         <th>Name</th>
                         <th>Status</th>
-                        <th>Package</th>
-                        <th>Expiry Date</th>
+                        <th>VOD Expiry</th>
+                        <th>IPTV Expiry</th>
                         <th>Last Login</th>
                         <th>Actions</th>
                     </tr>
@@ -38,22 +38,37 @@
                         <td>{{ user.first_name or '' }} {{ user.last_name or '' }}</td>
                         <td>
                             {% if user.is_disabled %}
-                                <span class="badge bg-danger">Disabled</span>
+                                <span class="badge bg-danger">VOD Disabled</span><br>
                             {% else %}
-                                <span class="badge bg-success">Active</span>
+                                <span class="badge bg-success">VOD Active</span><br>
+                            {% endif %}
+                            {% if user.iptv_is_disabled %}
+                                <span class="badge bg-danger mt-1">Live TV Disabled</span>
+                            {% else %}
+                                <span class="badge bg-success mt-1">Live TV Active</span>
                             {% endif %}
                         </td>
                         <td>
-                            {{ user.package or 'None' }}
+                            {% if user.vod_do_not_expire %}
+                                <span class="text-success"><i class="fas fa-infinity"></i> Never</span>
+                            {% elif user.vod_expiry_date %}
+                                {% if user.is_vod_expired() %}
+                                    <span class="text-danger fw-bold">{{ user.vod_expiry_date.strftime('%Y-%m-%d %H:%M') }}</span>
+                                {% else %}
+                                    {{ user.vod_expiry_date.strftime('%Y-%m-%d %H:%M') }}
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">Not Set</span>
+                            {% endif %}
                         </td>
                         <td>
-                            {% if user.do_not_expire %}
+                            {% if user.iptv_do_not_expire %}
                                 <span class="text-success"><i class="fas fa-infinity"></i> Never</span>
-                            {% elif user.expiry_date %}
-                                {% if user.is_expired() %}
-                                    <span class="text-danger fw-bold">{{ user.expiry_date.strftime('%Y-%m-%d %H:%M') }}</span>
+                            {% elif user.iptv_expiry_date %}
+                                {% if user.is_iptv_expired() %}
+                                    <span class="text-danger fw-bold">{{ user.iptv_expiry_date.strftime('%Y-%m-%d %H:%M') }}</span>
                                 {% else %}
-                                    {{ user.expiry_date.strftime('%Y-%m-%d %H:%M') }}
+                                    {{ user.iptv_expiry_date.strftime('%Y-%m-%d %H:%M') }}
                                 {% endif %}
                             {% else %}
                                 <span class="text-muted">Not Set</span>

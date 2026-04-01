@@ -42,30 +42,71 @@
                     </div>
 
                     <hr>
-                    <h5 class="mb-3">Subscription Details</h5>
-
-                    <div class="row mb-3">
+                    <h5 class="mb-3">VOD Subscription</h5>
+                    <div class="row mb-4 align-items-center">
                         <div class="col-md-4">
-                            <label class="form-label" for="package">Package</label>
-                            <select class="form-select" id="package" name="package">
-                                <option value="">Select Package...</option>
-                                <option value="VOD" {% if user.package == 'VOD' %}selected{% endif %}>VOD</option>
-                                <option value="IPTV" {% if user.package == 'IPTV' %}selected{% endif %}>IPTV</option>
-                                <option value="VOD & IPTV" {% if user.package == 'VOD & IPTV' %}selected{% endif %}>VOD & IPTV</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label" for="expiry_date">Expiry Date</label>
-                            <input type="datetime-local" class="form-control" id="expiry_date" name="expiry_date"
-                                value="{% if user.expiry_date %}{{ user.expiry_date.strftime('%Y-%m-%dT%H:%M') }}{% endif %}">
+                            <label class="form-label" for="vod_expiry_date">Expiry Date</label>
+                            <input type="datetime-local" class="form-control" id="vod_expiry_date" name="vod_expiry_date"
+                                value="{% if user.vod_expiry_date %}{{ user.vod_expiry_date.strftime('%Y-%m-%dT%H:%M') }}{% endif %}">
                             <div class="form-check mt-2">
-                                <input class="form-check-input" type="checkbox" id="do_not_expire" name="do_not_expire" {% if user.do_not_expire %}checked{% endif %}>
-                                <label class="form-check-label text-success" for="do_not_expire">
+                                <input class="form-check-input" type="checkbox" id="vod_do_not_expire" name="vod_do_not_expire" {% if user.vod_do_not_expire %}checked{% endif %}>
+                                <label class="form-check-label text-success" for="vod_do_not_expire">
                                     <i class="fas fa-infinity" aria-hidden="true"></i> Do Not Expire
                                 </label>
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <button type="submit" name="start_trial" value="vod" class="btn btn-outline-info">
+                                <i class="fas fa-clock"></i> Start 7-Day Trial
+                            </button>
+                            {% if user.vod_had_trial %}
+                                <div class="text-warning mt-1" style="font-size: 0.85em;"><i class="fas fa-exclamation-triangle"></i> Had Trial</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            {% if user.is_disabled %}
+                                <span class="badge bg-danger">Account Disabled</span>
+                            {% else %}
+                                <span class="badge bg-success">Account Active</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h5 class="mb-3">IPTV Subscription</h5>
+                    <div class="row mb-4 align-items-center">
+                        <div class="col-md-4">
+                            <label class="form-label" for="iptv_expiry_date">Expiry Date</label>
+                            <input type="datetime-local" class="form-control" id="iptv_expiry_date" name="iptv_expiry_date"
+                                value="{% if user.iptv_expiry_date %}{{ user.iptv_expiry_date.strftime('%Y-%m-%dT%H:%M') }}{% endif %}">
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="iptv_do_not_expire" name="iptv_do_not_expire" {% if user.iptv_do_not_expire %}checked{% endif %}>
+                                <label class="form-check-label text-success" for="iptv_do_not_expire">
+                                    <i class="fas fa-infinity" aria-hidden="true"></i> Do Not Expire
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" name="start_trial" value="iptv" class="btn btn-outline-info">
+                                <i class="fas fa-tv"></i> Start 7-Day Trial
+                            </button>
+                            {% if user.iptv_had_trial %}
+                                <div class="text-warning mt-1" style="font-size: 0.85em;"><i class="fas fa-exclamation-triangle"></i> Had Trial</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            {% if user.iptv_is_disabled %}
+                                <span class="badge bg-danger">Live TV Disabled</span>
+                            {% else %}
+                                <span class="badge bg-success">Live TV Active</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h5 class="mb-3">Billing</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
                             <label class="form-label" for="payer_id">Paid By (Payer)</label>
                             <select class="form-select" id="payer_id" name="payer_id">
                                 <option value="none">Self / None</option>
@@ -81,6 +122,40 @@
                         <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save Changes</button>
                     </div>
                 </form>
+
+                <hr class="mt-5">
+                <h5 class="mb-3"><i class="fas fa-chart-line"></i> Recent Activity</h5>
+
+                {% if emby_activity.get('current_playing') %}
+                    <h6 class="text-primary mt-3">Currently Watching</h6>
+                    <ul class="list-group mb-3">
+                    {% for current in emby_activity['current_playing'] %}
+                        <li class="list-group-item bg-transparent">
+                            <strong>{{ current.show }}</strong><br>
+                            <small class="text-muted">
+                                Device: {{ current.device }} | IP: {{ current.ip }} | Duration: {{ (current.duration / 10000000 / 60)|round|int }} mins
+                            </small>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <h6 class="text-secondary mt-3">Past History (Last 20)</h6>
+                {% if past_activity %}
+                    <ul class="list-group mb-3">
+                    {% for history in past_activity %}
+                        <li class="list-group-item bg-transparent">
+                            <strong>{{ history.name }}</strong><br>
+                            <small class="text-muted">
+                                Played: {{ history.date[:10] }} {{ history.date[11:19] }}
+                            </small>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No recent history found.</p>
+                {% endif %}
+
             </div>
         </div>
     </div>
@@ -151,6 +226,25 @@
     </div>
 </div>
 
+<!-- Trial Override Modal -->
+<div class="modal fade" id="trialOverrideModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">Trial Override Required</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-dark">
+                This user has already had a 7-day trial for this service. Are you sure you want to grant another one?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" id="confirmOverrideBtn">Yes, Grant Trial</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -171,4 +265,69 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form that handles user details updates
+        const userForm = document.querySelector('form');
+        let overrideType = '';
+
+        userForm.addEventListener('submit', function(e) {
+            if (e.submitter && e.submitter.name === 'start_trial') {
+                e.preventDefault(); // Stop normal form submission
+
+                const formData = new FormData(userForm);
+                formData.append('start_trial', e.submitter.value);
+
+                fetch('', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.status === 400) {
+                        return response.json().then(data => {
+                            if (data.require_override) {
+                                // Show modal
+                                overrideType = data.require_override;
+                                var overrideModal = new bootstrap.Modal(document.getElementById('trialOverrideModal'));
+                                overrideModal.show();
+                            }
+                        });
+                    } else if (response.redirected) {
+                        window.location.href = response.url;
+                    } else {
+                        window.location.reload();
+                    }
+                }).catch(err => {
+                    console.error("Error submitting trial:", err);
+                    window.location.reload();
+                });
+            }
+        });
+
+        // Handle Confirmation in Modal
+        const confirmBtn = document.getElementById('confirmOverrideBtn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', function() {
+                // Add hidden inputs to the main form and submit it normally
+                const startTrialInput = document.createElement('input');
+                startTrialInput.type = 'hidden';
+                startTrialInput.name = 'start_trial';
+                startTrialInput.value = overrideType;
+
+                const overrideInput = document.createElement('input');
+                overrideInput.type = 'hidden';
+                overrideInput.name = 'override_trial';
+                overrideInput.value = 'true';
+
+                userForm.appendChild(startTrialInput);
+                userForm.appendChild(overrideInput);
+
+                // Submit the form
+                userForm.submit();
+            });
+        }
+    });
+</script>
 {% endblock %}

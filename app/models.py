@@ -18,13 +18,19 @@ class User(db.Model):
     fb_account = db.Column(db.String(255), nullable=True)
     paypal_account = db.Column(db.String(255), nullable=True)
 
-    # Package tracking
-    package = db.Column(db.String(50), nullable=True) # VOD, IPTV, or "VOD & IPTV"
+    # VOD tracking
+    vod_expiry_date = db.Column(db.DateTime, nullable=True)
+    vod_do_not_expire = db.Column(db.Boolean, default=False)
+    vod_had_trial = db.Column(db.Boolean, default=False)
 
-    # Expiry
-    expiry_date = db.Column(db.DateTime, nullable=True)
-    do_not_expire = db.Column(db.Boolean, default=False)
-    is_disabled = db.Column(db.Boolean, default=False) # Sync status from Emby
+    # IPTV tracking
+    iptv_expiry_date = db.Column(db.DateTime, nullable=True)
+    iptv_do_not_expire = db.Column(db.Boolean, default=False)
+    iptv_had_trial = db.Column(db.Boolean, default=False)
+    iptv_is_disabled = db.Column(db.Boolean, default=False) # Sync status from Emby Policy (EnableLiveTvAccess)
+
+    # General Emby Sync Status
+    is_disabled = db.Column(db.Boolean, default=False) # Sync status from Emby Policy (IsDisabled)
 
     # Relationship: Who pays for this user?
     payer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
@@ -38,9 +44,16 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def is_expired(self):
-        if self.do_not_expire:
+    def is_vod_expired(self):
+        if self.vod_do_not_expire:
             return False
-        if not self.expiry_date:
+        if not self.vod_expiry_date:
             return False
-        return datetime.utcnow() > self.expiry_date
+        return datetime.utcnow() > self.vod_expiry_date
+
+    def is_iptv_expired(self):
+        if self.iptv_do_not_expire:
+            return False
+        if not self.iptv_expiry_date:
+            return False
+        return datetime.utcnow() > self.iptv_expiry_date
