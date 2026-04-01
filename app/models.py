@@ -5,6 +5,16 @@ class Settings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     emby_url = db.Column(db.String(255), nullable=True)
     emby_api_key = db.Column(db.String(255), nullable=True)
+    default_vod_price = db.Column(db.Float, default=10.0)
+    default_iptv_price = db.Column(db.Float, default=10.0)
+
+class Payment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    method = db.Column(db.String(100), nullable=False) # e.g. PayPal, Cash, E-Transfer
+    service_applied = db.Column(db.String(50), nullable=False) # VOD, IPTV, Both
+    date = db.Column(db.DateTime, default=datetime.utcnow)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -31,6 +41,12 @@ class User(db.Model):
 
     # General Emby Sync Status
     is_disabled = db.Column(db.Boolean, default=False) # Sync status from Emby Policy (IsDisabled)
+
+    # Pricing & Billing
+    custom_vod_price = db.Column(db.Float, nullable=True)
+    custom_iptv_price = db.Column(db.Float, nullable=True)
+    credit_balance = db.Column(db.Float, default=0.0)
+    payments = db.relationship('Payment', backref='user', lazy=True, cascade="all, delete-orphan")
 
     # Relationship: Who pays for this user?
     payer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)

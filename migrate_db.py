@@ -11,7 +11,7 @@ def migrate(app, db):
             # OperationalError means it doesn't exist. We proceed to migration.
             db.session.rollback()
 
-        print("Starting database migration for VOD and IPTV tracking...")
+        print("Starting database migration for new features...")
 
         commands = [
             "ALTER TABLE user ADD COLUMN vod_expiry_date DATETIME",
@@ -20,7 +20,12 @@ def migrate(app, db):
             "ALTER TABLE user ADD COLUMN iptv_expiry_date DATETIME",
             "ALTER TABLE user ADD COLUMN iptv_do_not_expire BOOLEAN DEFAULT 0",
             "ALTER TABLE user ADD COLUMN iptv_had_trial BOOLEAN DEFAULT 0",
-            "ALTER TABLE user ADD COLUMN iptv_is_disabled BOOLEAN DEFAULT 0"
+            "ALTER TABLE user ADD COLUMN iptv_is_disabled BOOLEAN DEFAULT 0",
+            "ALTER TABLE settings ADD COLUMN default_vod_price FLOAT DEFAULT 10.0",
+            "ALTER TABLE settings ADD COLUMN default_iptv_price FLOAT DEFAULT 10.0",
+            "ALTER TABLE user ADD COLUMN custom_vod_price FLOAT",
+            "ALTER TABLE user ADD COLUMN custom_iptv_price FLOAT",
+            "ALTER TABLE user ADD COLUMN credit_balance FLOAT DEFAULT 0.0"
         ]
 
         for cmd in commands:
@@ -29,6 +34,22 @@ def migrate(app, db):
             except Exception as e:
                 print(f"Skipping (might already exist): {cmd}")
                 db.session.rollback()
+
+        try:
+            db.session.execute(text("""
+                CREATE TABLE IF NOT EXISTS payment (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    amount FLOAT NOT NULL,
+                    method VARCHAR(100) NOT NULL,
+                    service_applied VARCHAR(50) NOT NULL,
+                    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(user_id) REFERENCES user(id)
+                )
+            """))
+        except Exception as e:
+            print(f"Error creating payment table: {e}")
+            db.session.rollback()
 
         print("Migrating existing data based on package types...")
 

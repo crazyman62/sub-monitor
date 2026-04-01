@@ -25,6 +25,25 @@
                         <div class="form-text">Generate this from your Emby Server Dashboard -> Advanced -> API Keys.</div>
                     </div>
 
+                    <hr class="my-4">
+                    <h5 class="mb-3">Default Pricing ($/Month)</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="default_vod_price" class="form-label fw-bold">VOD Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="default_vod_price" name="default_vod_price" value="{{ setting.default_vod_price or 10.0 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="default_iptv_price" class="form-label fw-bold">IPTV Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="default_iptv_price" name="default_iptv_price" value="{{ setting.default_iptv_price or 10.0 }}">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Save Settings</button>
                     </div>

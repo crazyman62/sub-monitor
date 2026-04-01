@@ -12,6 +12,27 @@
     </div>
 </div>
 
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card bg-primary text-white h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-film"></i> VOD Analytics</h5>
+                <p class="card-text mb-1"><strong>Active Users:</strong> {{ active_vod_count }}</p>
+                <p class="card-text"><strong>Monthly Revenue:</strong> ${{ "%.2f"|format(vod_revenue) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mt-3 mt-md-0">
+        <div class="card bg-success text-white h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-tv"></i> IPTV Analytics</h5>
+                <p class="card-text mb-1"><strong>Active Users:</strong> {{ active_iptv_count }}</p>
+                <p class="card-text"><strong>Monthly Revenue:</strong> ${{ "%.2f"|format(iptv_revenue) }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="card shadow-sm">
     <div class="card-body">
         <div class="table-responsive">
