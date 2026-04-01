@@ -31,6 +31,7 @@ def sync_and_check_expiry(app):
             e_id = e_user.get('Id')
             e_username = e_user.get('Name')
             is_disabled = e_user.get('Policy', {}).get('IsDisabled', False)
+            iptv_access = e_user.get('Policy', {}).get('EnableLiveTvAccess', True)
             emby_user_ids.append(e_id)
 
             # Find or create user in DB
@@ -43,6 +44,7 @@ def sync_and_check_expiry(app):
                 db_user.username = e_username
 
             db_user.is_disabled = is_disabled
+            db_user.iptv_is_disabled = not iptv_access
 
             # Fetch recent activity (lightweight cache)
             # This might add API calls for each user, doing it hourly is acceptable for small servers.
@@ -61,18 +63,23 @@ def sync_and_check_expiry(app):
                 if activity['last_device']:
                     db_user.last_device = activity['last_device']
 
-            # Check Expiry
-            if not db_user.do_not_expire and db_user.expiry_date:
-                if datetime.utcnow() > db_user.expiry_date:
+            # Check VOD Expiry
+            if not db_user.vod_do_not_expire and db_user.vod_expiry_date:
+                if datetime.utcnow() > db_user.vod_expiry_date:
                     # Expired! Disable if not already disabled
                     if not db_user.is_disabled:
-                        print(f"Disabling expired user: {db_user.username}")
+                        print(f"Disabling expired VOD user: {db_user.username}")
                         if emby.disable_user(e_id):
                             db_user.is_disabled = True
-                else:
-                    # Not expired! Enable if it was disabled (e.g. they renewed)
-                    # Note: You might want manual control here, but auto-enable on un-expiring is usually desired
-                    pass
+
+            # Check IPTV Expiry
+            if not db_user.iptv_do_not_expire and db_user.iptv_expiry_date:
+                if datetime.utcnow() > db_user.iptv_expiry_date:
+                    # Expired! Disable Live TV if not already disabled
+                    if not db_user.iptv_is_disabled:
+                        print(f"Disabling Live TV for expired IPTV user: {db_user.username}")
+                        if emby.disable_iptv(e_id):
+                            db_user.iptv_is_disabled = True
 
         try:
             db.session.commit()

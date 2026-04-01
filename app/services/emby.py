@@ -91,10 +91,33 @@ class EmbyClient:
                 if latest_session.get('DeviceName'):
                     last_device = f"{last_device} ({latest_session.get('DeviceName')})"
 
+        # Fetch playback history
+        # Emby's /Users/{UserId}/Items with Filters=IsPlayed or similar might work,
+        # but let's query the sessions endpoint directly for active viewing, and
+        # possibly we can't get past viewing without an activity log or playback plugin.
+        # We will retrieve current active sessions.
+        current_playing = []
+        if sessions:
+            user_sessions = [s for s in sessions if s.get('UserId') == user_id]
+            for s in user_sessions:
+                if s.get('NowPlayingItem'):
+                    item = s.get('NowPlayingItem')
+                    name = item.get('Name')
+                    if item.get('Type') == 'Episode':
+                        name = f"{item.get('SeriesName')} - {name}"
+                    duration_ticks = s.get('PlayState', {}).get('PositionTicks', 0)
+                    current_playing.append({
+                        'device': s.get('Client'),
+                        'ip': s.get('RemoteEndPoint'),
+                        'show': name,
+                        'duration': duration_ticks  # Note: Ticks are 10,000 per ms
+                    })
+
         return {
             'last_login_date': last_login_date,
             'last_ip': last_ip,
-            'last_device': last_device
+            'last_device': last_device,
+            'current_playing': current_playing
         }
 
     def disable_user(self, user_id):
@@ -121,6 +144,51 @@ class EmbyClient:
 
         response = self._post(f'/emby/Users/{user_id}/Policy', data=policy)
         return response is not None
+
+    def disable_iptv(self, user_id):
+        """Disable IPTV access for a user."""
+        user = self.get_user(user_id)
+        if not user or 'Policy' not in user:
+            return False
+
+        policy = user['Policy']
+        policy['EnableLiveTvAccess'] = False
+
+        response = self._post(f'/emby/Users/{user_id}/Policy', data=policy)
+        return response is not None
+
+    def enable_iptv(self, user_id):
+        """Enable IPTV access for a user."""
+        user = self.get_user(user_id)
+        if not user or 'Policy' not in user:
+            return False
+
+        policy = user['Policy']
+        policy['EnableLiveTvAccess'] = True
+
+        response = self._post(f'/emby/Users/{user_id}/Policy', data=policy)
+        return response is not None
+
+    def get_past_activity(self, user_id):
+        """Fetch past activity (like items played)."""
+        # ActivityLog gives general activity, which might be helpful
+        # Unfortunately Emby API doesn't easily expose a simple playback history list per user without
+        # scanning Items or ActivityLog.
+        # We will check System/ActivityLog for playback events.
+        try:
+            log = self._get(f'/emby/System/ActivityLog?Limit=20&UserId={user_id}')
+            history = []
+            if log and 'Items' in log:
+                for entry in log['Items']:
+                    if entry.get('Type') == 'VideoPlayback':
+                        history.append({
+                            'name': entry.get('Name'),
+                            'date': entry.get('Date'),
+                            'overview': entry.get('Overview')
+                        })
+            return history
+        except Exception:
+            return []
 
     def delete_user(self, user_id):
         """Delete a user from Emby."""
