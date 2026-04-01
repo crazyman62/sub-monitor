@@ -4,7 +4,7 @@ FROM python:3.11-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV FLASK_APP=app.app
+ENV FLASK_APP="app:create_app()"
 ENV DATABASE_PATH="sqlite:////data/emby_manager.db"
 
 # Create working directory
@@ -30,4 +30,4 @@ COPY . /app/
 EXPOSE 5005
 
 # Run gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5005", "app.app:app", "--workers", "1", "--threads", "2", "--timeout", "60"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5005", "app:create_app()", "--workers", "1", "--threads", "2", "--timeout", "60"]
