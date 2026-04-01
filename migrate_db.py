@@ -2,15 +2,6 @@ from sqlalchemy import text
 
 def migrate(app, db):
     with app.app_context():
-        # Check if vod_expiry_date column exists
-        try:
-            db.session.execute(text("SELECT vod_expiry_date FROM user LIMIT 1"))
-            print("Database is already up to date.")
-            return
-        except Exception as e:
-            # OperationalError means it doesn't exist. We proceed to migration.
-            db.session.rollback()
-
         print("Starting database migration for new features...")
 
         commands = [
