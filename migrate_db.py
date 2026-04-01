@@ -1,9 +1,6 @@
-from app import create_app, db
 from sqlalchemy import text
 
-app = create_app()
-
-def migrate():
+def migrate(app, db):
     with app.app_context():
         # Check if vod_expiry_date column exists
         try:
@@ -48,4 +45,6 @@ def migrate():
             print(f"Failed to migrate data (perhaps old columns are missing): {e}")
 
 if __name__ == "__main__":
-    migrate()
+    from app import create_app, db
+    app = create_app()
+    migrate(app, db)
