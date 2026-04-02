@@ -205,9 +205,17 @@ def user_details(user_id):
                 amount = float(request.form.get('payment_amount', 0))
                 method = request.form.get('payment_method')
                 service_applied = request.form.get('service_applied')
+                payment_date_str = request.form.get('payment_date')
+
+                payment_date = datetime.utcnow()
+                if payment_date_str:
+                    try:
+                        payment_date = datetime.strptime(payment_date_str, '%Y-%m-%dT%H:%M')
+                    except ValueError:
+                        pass
 
                 if amount > 0:
-                    payment = Payment(user_id=user.id, amount=amount, method=method, service_applied=service_applied)
+                    payment = Payment(user_id=user.id, amount=amount, method=method, service_applied=service_applied, date=payment_date)
                     db.session.add(payment)
 
                     user.credit_balance = (user.credit_balance or 0.0) + amount
