@@ -7,6 +7,9 @@ class Settings(db.Model):
     emby_api_key = db.Column(db.String(255), nullable=True)
     default_vod_price = db.Column(db.Float, default=10.0)
     default_iptv_price = db.Column(db.Float, default=10.0)
+    paypal_client_id = db.Column(db.String(255), nullable=True)
+    paypal_secret = db.Column(db.String(255), nullable=True)
+    paypal_sandbox = db.Column(db.Boolean, default=True)
 
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -15,6 +18,7 @@ class Payment(db.Model):
     method = db.Column(db.String(100), nullable=False) # e.g. PayPal, Cash, E-Transfer
     service_applied = db.Column(db.String(50), nullable=False) # VOD, IPTV, Both
     date = db.Column(db.DateTime, default=datetime.utcnow)
+    transaction_id = db.Column(db.String(255), unique=True, nullable=True)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,6 +45,10 @@ class User(db.Model):
 
     # General Emby Sync Status
     is_disabled = db.Column(db.Boolean, default=False) # Sync status from Emby Policy (IsDisabled)
+
+    # Auto Renew Settings
+    vod_auto_renew = db.Column(db.Boolean, default=False)
+    iptv_auto_renew = db.Column(db.Boolean, default=False)
 
     # Pricing & Billing
     custom_vod_price = db.Column(db.Float, nullable=True)

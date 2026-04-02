@@ -12,11 +12,17 @@ def migrate(app, db):
             "ALTER TABLE user ADD COLUMN iptv_do_not_expire BOOLEAN DEFAULT 0",
             "ALTER TABLE user ADD COLUMN iptv_had_trial BOOLEAN DEFAULT 0",
             "ALTER TABLE user ADD COLUMN iptv_is_disabled BOOLEAN DEFAULT 0",
+            "ALTER TABLE user ADD COLUMN vod_auto_renew BOOLEAN DEFAULT 0",
+            "ALTER TABLE user ADD COLUMN iptv_auto_renew BOOLEAN DEFAULT 0",
             "ALTER TABLE settings ADD COLUMN default_vod_price FLOAT DEFAULT 10.0",
             "ALTER TABLE settings ADD COLUMN default_iptv_price FLOAT DEFAULT 10.0",
+            "ALTER TABLE settings ADD COLUMN paypal_client_id VARCHAR(255)",
+            "ALTER TABLE settings ADD COLUMN paypal_secret VARCHAR(255)",
+            "ALTER TABLE settings ADD COLUMN paypal_sandbox BOOLEAN DEFAULT 1",
             "ALTER TABLE user ADD COLUMN custom_vod_price FLOAT",
             "ALTER TABLE user ADD COLUMN custom_iptv_price FLOAT",
-            "ALTER TABLE user ADD COLUMN credit_balance FLOAT DEFAULT 0.0"
+            "ALTER TABLE user ADD COLUMN credit_balance FLOAT DEFAULT 0.0",
+            "ALTER TABLE payment ADD COLUMN transaction_id VARCHAR(255) UNIQUE"
         ]
 
         for cmd in commands:

@@ -4,6 +4,7 @@ from app.models import User, Settings, Payment
 from app.tasks import sync_and_check_expiry
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+import uuid
 
 bp = Blueprint('main', __name__)
 
@@ -193,6 +194,9 @@ def user_details(user_id):
             user.vod_do_not_expire = 'vod_do_not_expire' in request.form
             user.iptv_do_not_expire = 'iptv_do_not_expire' in request.form
 
+            user.vod_auto_renew = 'vod_auto_renew' in request.form
+            user.iptv_auto_renew = 'iptv_auto_renew' in request.form
+
             payer_id = request.form.get('payer_id')
             if payer_id and payer_id != 'none':
                 user.payer_id = int(payer_id)
@@ -215,7 +219,12 @@ def user_details(user_id):
                         pass
 
                 if amount > 0:
+<<<<<<< feature/paypal-integration-6173929968939190067
+                    transaction_id = f"Manual-{uuid.uuid4()}"
+                    payment = Payment(user_id=user.id, amount=amount, method=method, service_applied=service_applied, transaction_id=transaction_id)
+=======
                     payment = Payment(user_id=user.id, amount=amount, method=method, service_applied=service_applied, date=payment_date)
+>>>>>>> feature/emby-manager-13838444456425977904
                     db.session.add(payment)
 
                     user.credit_balance = (user.credit_balance or 0.0) + amount
@@ -315,6 +324,10 @@ def settings():
             setting.default_iptv_price = float(request.form.get('default_iptv_price', 10.0))
         except ValueError:
             flash("Invalid price values. Defaults kept.", "warning")
+
+        setting.paypal_client_id = request.form.get('paypal_client_id')
+        setting.paypal_secret = request.form.get('paypal_secret')
+        setting.paypal_sandbox = 'paypal_sandbox' in request.form
 
         db.session.commit()
         flash("Settings saved successfully.", "success")

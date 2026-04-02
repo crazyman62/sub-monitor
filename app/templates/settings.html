@@ -44,6 +44,31 @@
                         </div>
                     </div>
 
+                    <hr class="my-4">
+                    <h5 class="mb-3">PayPal Integration</h5>
+                    <div class="mb-4">
+                        <label for="paypal_client_id" class="form-label fw-bold">Client ID</label>
+                        <input type="text" class="form-control" id="paypal_client_id" name="paypal_client_id"
+                               value="{{ setting.paypal_client_id or '' }}"
+                               placeholder="e.g. Ae_1b2c3d4e5f6g7h8i9j0...">
+                        <div class="form-text">Your PayPal API Client ID. Leave blank to disable PayPal integration.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="paypal_secret" class="form-label fw-bold">Secret</label>
+                        <input type="password" class="form-control" id="paypal_secret" name="paypal_secret"
+                               value="{{ setting.paypal_secret or '' }}"
+                               placeholder="e.g. EN_a1b2c3d4e5f6g7h8i9j0...">
+                        <div class="form-text">Your PayPal API Secret.</div>
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="paypal_sandbox" name="paypal_sandbox"
+                               {% if setting.paypal_sandbox %}checked{% endif %}>
+                        <label class="form-check-label fw-bold" for="paypal_sandbox">Use PayPal Sandbox</label>
+                        <div class="form-text">Check this box to use the PayPal sandbox environment for testing.</div>
+                    </div>
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Save Settings</button>
                     </div>
