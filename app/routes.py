@@ -219,12 +219,8 @@ def user_details(user_id):
                         pass
 
                 if amount > 0:
-<<<<<<< feature/paypal-integration-6173929968939190067
                     transaction_id = f"Manual-{uuid.uuid4()}"
-                    payment = Payment(user_id=user.id, amount=amount, method=method, service_applied=service_applied, transaction_id=transaction_id)
-=======
-                    payment = Payment(user_id=user.id, amount=amount, method=method, service_applied=service_applied, date=payment_date)
->>>>>>> feature/emby-manager-13838444456425977904
+                    payment = Payment(user_id=user.id, amount=amount, method=method, service_applied=service_applied, transaction_id=transaction_id, date=payment_date)
                     db.session.add(payment)
 
                     user.credit_balance = (user.credit_balance or 0.0) + amount
