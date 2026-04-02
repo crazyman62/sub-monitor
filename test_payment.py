@@ -44,4 +44,13 @@ with app.app_context():
     assert months_to_add == 1
     assert remainder == 5.0
 
+    # Test 4: Backdated payment logic
+    past_date = datetime(2023, 1, 1, 12, 0)
+    payment = Payment(user_id=user.id, amount=20.0, method="Cash", service_applied="VOD", date=past_date)
+    db.session.add(payment)
+    db.session.commit()
+
+    assert payment.date == past_date
+    print("Test 4 - Backdated payment date saved successfully.")
+
     print("Backend Logic tests passed.")

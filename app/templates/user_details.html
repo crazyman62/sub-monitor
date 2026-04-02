@@ -154,7 +154,7 @@
                             <div class="card-header bg-secondary text-white">Record New Payment</div>
                             <div class="card-body">
                                 <form method="POST">
-                                    <div class="row g-2 align-items-center">
+                                    <div class="row g-2 align-items-center mb-2">
                                         <div class="col-md-3">
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text">$</span>
@@ -179,11 +179,16 @@
                                                 <option value="IPTV">IPTV Only</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-3 text-end">
+                                        <div class="col-md-3">
+                                            <input type="datetime-local" class="form-control form-control-sm" name="payment_date" title="Leave blank for current time">
+                                        </div>
+                                    </div>
+                                    <div class="row g-2 align-items-center">
+                                        <div class="col-md-12 text-end">
                                             <button type="submit" name="record_payment" value="true" class="btn btn-sm btn-success w-100">Add Payment</button>
                                         </div>
                                     </div>
-                                    <small class="text-muted d-block mt-2">Adding a payment will automatically calculate and extend expiry dates.</small>
+                                    <small class="text-muted d-block mt-2">Adding a payment will automatically calculate and extend expiry dates. Leave the date field blank to use the current time.</small>
                                 </form>
                             </div>
                         </div>
