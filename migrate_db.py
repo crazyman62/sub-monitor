@@ -22,15 +22,9 @@ def migrate(app, db):
             "ALTER TABLE user ADD COLUMN custom_vod_price FLOAT",
             "ALTER TABLE user ADD COLUMN custom_iptv_price FLOAT",
             "ALTER TABLE user ADD COLUMN credit_balance FLOAT DEFAULT 0.0",
-            "ALTER TABLE payment ADD COLUMN transaction_id VARCHAR(255) UNIQUE"
+            "ALTER TABLE payment ADD COLUMN transaction_id VARCHAR(255)",
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_payment_transaction_id ON payment(transaction_id)"
         ]
-
-        for cmd in commands:
-            try:
-                db.session.execute(text(cmd))
-            except Exception as e:
-                print(f"Skipping (might already exist): {cmd}")
-                db.session.rollback()
 
         try:
             db.session.execute(text("""
@@ -41,12 +35,20 @@ def migrate(app, db):
                     method VARCHAR(100) NOT NULL,
                     service_applied VARCHAR(50) NOT NULL,
                     date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    transaction_id VARCHAR(255) UNIQUE,
                     FOREIGN KEY(user_id) REFERENCES user(id)
                 )
             """))
         except Exception as e:
             print(f"Error creating payment table: {e}")
             db.session.rollback()
+
+        for cmd in commands:
+            try:
+                db.session.execute(text(cmd))
+            except Exception as e:
+                print(f"Skipping (might already exist): {cmd}")
+                db.session.rollback()
 
         print("Migrating existing data based on package types...")
 
